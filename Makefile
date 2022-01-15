@@ -1,8 +1,8 @@
-NAME		= libftprintf.a
+NAME		= push_swap
 LIBFT		= libft
 LIBFT_LIB	= libft.a
 
-SRCS		= main.c
+SRCS		= push_swap.c
 
 OBJS		= $(SRCS:%.c=%.o)
 
@@ -14,9 +14,7 @@ all			:	$(NAME)
 
 $(NAME)		:	$(OBJS)
 		make all -C $(LIBFT)/
-		cp $(LIBFT)/$(LIBFT_LIB) $(NAME)
-		$(LIBC) $(NAME) $(OBJS)
-		gcc -o push_swap -C $(NAME) $(OBJS)
+		gcc -o $(NAME) $(OBJS) -Llibft -lft
 
 %.o			:	%.c
 		gcc $(FLAGS) -c $^ -I./ -o $@

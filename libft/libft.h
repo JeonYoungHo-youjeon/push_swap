@@ -6,7 +6,7 @@
 /*   By: youjeon <youjeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 11:12:50 by youjeon           #+#    #+#             */
-/*   Updated: 2021/10/14 16:14:50 by youjeon          ###   ########.fr       */
+/*   Updated: 2022/01/15 13:04:08 by youjeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ int					ft_isdigit(int c);
 int					ft_isalnum(int c);
 int					ft_isascii(int c);
 int					ft_isprint(int c);
+int					ft_isspace(char c);
 int					ft_toupper(int c);
 int					ft_tolower(int c);
 void				*ft_calloc(size_t n, size_t size);

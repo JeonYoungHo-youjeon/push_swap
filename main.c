@@ -6,7 +6,7 @@
 /*   By: youjeon <youjeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/09 16:43:08 by youjeon           #+#    #+#             */
-/*   Updated: 2022/01/12 17:20:23 by youjeon          ###   ########.fr       */
+/*   Updated: 2022/01/15 12:26:15 by youjeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,14 +129,9 @@ char	**ft_split(char const *s, char c)
 
 int	print_error(int type)
 {
-	printf("%d\n", type);
 	if (type >= 1)
 	{
 		write(2, "Error\n", 6);
-	}
-	else if (type <= -1)
-	{
-		write(2, "\n", 1);
 	}
 	exit(1);
 	return (-1);
@@ -156,11 +151,16 @@ t_numbers	*ft_stack_new(void)
 
 t_info	*ft_info_new(void)
 {
-	t_info	*new_mem;
+	t_numbers	*stack_a;
+	t_info		*new_mem;
 
 	new_mem = NULL;
 	new_mem = (t_info *)malloc(sizeof(t_info));
+	stack_a = ft_stack_new();
+	new_mem->array = NULL;
 	new_mem->size_a = 0;
+	new_mem->top_a = stack_a;
+	new_mem->bottom_a = stack_a;
 	new_mem->size_b = 0;
 	return (new_mem);
 }
@@ -218,7 +218,7 @@ int	ft_isspace(char c)
 	return (0);
 }
 
-long long	ft_atoll(const char *str)
+int		ft_atoll(const char *str)
 {
 	long long	result;
 	int			np;
@@ -243,13 +243,13 @@ long long	ft_atoll(const char *str)
 	if (*str != '\0' || chker > 10
 		|| result > 2147483647 || result < -2147483648)
 		print_error(1);
-	return (result);
+	return ((int)result);
 }
 
-void	set_str_to_array(long long *array, int *arr_index, char **str)
+void	set_str_to_array(int *array, int *arr_index, char **str)
 {
-	long long	tmp_number;
-	int			index;
+	int	tmp_number;
+	int	index;
 
 	index = 0;
 	while (str[index])
@@ -261,16 +261,16 @@ void	set_str_to_array(long long *array, int *arr_index, char **str)
 	}
 }
 
-long long	*ft_av_to_array(int ac, char *av[], int size)
+int		*ft_av_to_array(int ac, char *av[], int size)
 {
-	int			ac_index;
-	int			arr_index;
-	long long	*new_array;
-	char		**split_str;
+	int		ac_index;
+	int		arr_index;
+	int		*new_array;
+	char	**split_str;
 
 	ac_index = 1;
 	arr_index = 0;
-	new_array = (long long *)malloc(sizeof(long long) * size);
+	new_array = (int *)malloc(sizeof(int) * size);
 	if (!new_array)
 		print_error(1);
 	while (ac_index < ac)
@@ -284,7 +284,7 @@ long long	*ft_av_to_array(int ac, char *av[], int size)
 	return (new_array);
 }
 
-void	ft_arr_to_stack(t_numbers *stack, long long *array, t_info *info, int size)
+void	ft_arr_to_stack(t_info *info, int *array, int size)
 {
 	t_numbers	*new_node;
 	int			index;
@@ -293,194 +293,712 @@ void	ft_arr_to_stack(t_numbers *stack, long long *array, t_info *info, int size)
 	while (index < size)
 	{
 		new_node = ft_stack_new();
-		info->size_a++;
-		stack->content = (int)array[index];
-		stack->next = new_node;
-		new_node->prev = stack;
-		stack = stack->next;
+		info->size_a += 1;
+		info->bottom_a->content = (int)array[index];
+		info->bottom_a->next = new_node;
+		new_node->prev = info->bottom_a;
+		info->bottom_a = new_node;
 		index++;
 	}
-	printf("ft_arr_to_stack index = %d\n", index);
+	info->bottom_a = info->bottom_a->prev;
+	free(new_node);
 }
 
-void	ft_array_sort(long long *array, int size)
+void	ft_check_array_sort(int *array, int size, int index)
 {
-	int	index;
+	int	j;
 	int	checker;
 	int	tmp;
 
-	index = 0;
 	checker = 0;
-	while (index < size - 1)
+	while (index < size)
 	{
-		if (array[index] > array[index + 1])
+		j = 0;
+		while (j < size - 1)
 		{
-			tmp = array[index];
-			array[index] = array[index + 1];
-			array[index + 1] = tmp;
-			checker++;
+			if (array[j] > array[j + 1])
+			{
+				tmp = array[j];
+				array[j] = array[j + 1];
+				array[j + 1] = tmp;
+				checker++;
+			}
+				j++;
 		}
 		if (array[index] == array[index + 1])
-		{
 			print_error(1);
-		}
 		index++;
 	}
 	if (checker == 0)
-	{
-		print_error(-1);
-	}
+		print_error(-12);
 }
 
-void	test_print_array(long long *array, int size)
-{
-	int	index;
+// void	test_print_array(int *array, int size)
+// {
+// 	int	index;
 
-	printf("test_print_array\n");
+// 	index = 0;
+// 	while (index < size)
+// 	{
+// 		index++;
+// 	}
+// }
+
+int test_index = 0;
+
+void	test_print_stack(t_info *info)
+{
+	int			index;
+	t_numbers	*stack;
+
+	test_index++;
+	
+	//printf("test_index = %d\n", test_index);
+	printf("stack_a\n");
 	index = 0;
-	while (index < size)
+	stack = info->top_a;
+	while (index < info->size_a)
 	{
-		printf("%d\n", (int)array[index]);
+		printf("%d\n", stack->content);
+		stack = stack->next;
+		index++;
+	}
+	printf("stack_b\n");
+	index = 0;
+	stack = info->top_b;
+	while (index < info->size_b)
+	{
+		printf("%d\n", stack->content);
+		stack = stack->next;
 		index++;
 	}
 }
 
-void	test_print_stack(t_numbers *stack)
-{
-	while (stack->next)
-	{
-		printf("%d\n", stack->content);
-		stack = stack->next;
-	}
-}
-
-void	sa(t_numbers *a, t_info *info)
+void	sa(t_info *info)
 {
 	int	tmp;
 
 	if (info->size_a < 2)
 	{
-		print_error(3);
+		return ;
 	}
-	tmp = a->next->content;
-	a->next->content = a->content;
-	a->content = tmp;
+	tmp = info->top_a->content;
+	info->top_a->content = info->top_a->next->content;
+	info->top_a->next->content = tmp;
 	write(1, "sa\n", 3);
 }
 
-void	sb(t_numbers *b, t_info *info)
+void	sb(t_info *info)
 {
 	int	tmp;
 
 	if (info->size_b < 2)
 	{
-		print_error(4);
+		return ;
 	}
-	tmp = b->next->content;
-	b->next->content = b->content;
-	b->content = tmp;
+	tmp = info->top_b->content;
+	info->top_b->content = info->top_b->next->content;
+	info->top_b->next->content = tmp;
 	write(1, "sb\n", 3);
 }
 
-void	ss(t_numbers *a, t_numbers *b, t_info *info)
+void	ss(t_info *info)
 {
 	int	tmp;
 
 	if (info->size_a < 2)
 	{
-		print_error(5);
+		return ;
 	}
 	if (info->size_b < 2)
 	{
-		print_error(6);
+		return ;
 	}
-	tmp = a->next->content;
-	a->next->content = a->content;
-	a->content = tmp;
-	tmp = b->next->content;
-	b->next->content = b->content;
-	b->content = tmp;
+	tmp = info->top_a->content;
+	info->top_a->content = info->top_a->next->content;
+	info->top_a->next->content = tmp;
+	tmp = info->top_b->content;
+	info->top_b->content = info->top_b->next->content;
+	info->top_b->next->content = tmp;
 	write(1, "ss\n", 3);
 }
 
-void	pa(t_numbers **a, t_numbers **b, t_info *info)
+void	pa(t_info *info)
 {
 	t_numbers	*tmp;
 
 	if (info->size_b < 1)
+		return ;
+	tmp = info->top_b;
+	if (info->size_b > 1)
 	{
-		print_error(7);
+		info->top_b = info->top_b->next;
+		info->top_b->prev = NULL;
 	}
-	tmp = *b;
-	*b = (*b)->next;
-	(*a)->prev = tmp;
-	tmp->next = (*a);
-	*a = tmp;
+	if (info->size_a == 0)
+	{
+		tmp->next = NULL;
+		info->top_a = tmp;
+		info->bottom_a = tmp;
+	}
+	else
+	{
+		tmp->next = info->top_a;
+		info->top_a->prev = tmp;
+		info->top_a = tmp;
+	}
 	info->size_a += 1;
 	info->size_b -= 1;
 	write(1, "pa\n", 3);
 }
 
-void	pb(t_numbers **a, t_numbers **b, t_info *info)
+void	pb(t_info *info)
 {
 	t_numbers	*tmp;
 
 	if (info->size_a < 1)
+		return ;
+	tmp = info->top_a;
+	if (info->size_a > 1)
 	{
-		print_error(8);
+		info->top_a = info->top_a->next;
+		info->top_a->prev = NULL;
 	}
-	tmp = *a;
-	*a = (*a)->next;
-	(*b)->prev = tmp;
-	tmp->next = (*b);
-	*b = tmp;
+	if (info->size_b == 0)
+	{
+		tmp->next = NULL;
+		info->top_b = tmp;
+		info->bottom_b = tmp;
+	}
+	else
+	{
+		tmp->next = info->top_b;
+		info->top_b->prev = tmp;
+		info->top_b = tmp;
+	}
 	info->size_a -= 1;
 	info->size_b += 1;
 	write(1, "pb\n", 3);
 }
 
-void	test_instuct(t_numbers *a, t_numbers *b, t_info *info)
+void	ra(t_info *info)
+{
+	t_numbers	*tmp;
+
+	if (info->size_a < 2)
+	{
+		return ;
+	}
+	tmp = info->top_a;
+	info->top_a = info->top_a->next;
+	info->top_a->prev = NULL;
+	info->bottom_a->next = tmp;
+	tmp->prev = info->bottom_a;
+	info->bottom_a = tmp;
+	info->bottom_a->next = NULL;
+	write(1, "ra\n", 3);
+}
+
+void	rb(t_info *info)
+{
+	t_numbers	*tmp;
+
+	if (info->size_b < 2)
+	{
+		return ;
+	}
+	tmp = info->top_b;
+	info->top_b = info->top_b->next;
+	info->top_b->prev = NULL;
+	info->bottom_b->next = tmp;
+	tmp->prev = info->bottom_b;
+	info->bottom_b = tmp;
+	info->bottom_a->next = NULL;
+	write(1, "rb\n", 3);
+}
+
+void	rr(t_info *info)
+{
+	t_numbers	*tmp;
+
+	if (info->size_b < 2 || info->size_a < 2)
+	{
+		return ;
+	}
+	tmp = info->top_a;
+	info->top_a = info->top_a->next;
+	info->top_a->prev = NULL;
+	info->bottom_a->next = tmp;
+	tmp->prev = info->bottom_a;
+	info->bottom_a = tmp;
+	info->bottom_a->next = NULL;
+	tmp = info->top_b;
+	info->top_b = info->top_b->next;
+	info->top_b->prev = NULL;
+	info->bottom_b->next = tmp;
+	tmp->prev = info->bottom_b;
+	info->bottom_b = tmp;
+	info->bottom_a->next = NULL;
+	write(1, "rr\n", 3);
+}
+
+void	rra(t_info *info)
+{
+	t_numbers	*tmp;
+
+	if (info->size_a < 2)
+	{
+		return ;
+	}
+	tmp = info->bottom_a;
+	info->bottom_a = info->bottom_a->prev;
+	info->bottom_a->next = NULL;
+	info->top_a->prev = tmp;
+	tmp->next = info->top_a;
+	info->top_a = tmp;
+	info->top_a->prev = NULL;
+	write(1, "rra\n", 4);
+}
+
+void	rrb(t_info *info)
+{
+	t_numbers	*tmp;
+
+	if (info->size_b < 2)
+	{
+		return ;
+	}
+	tmp = info->bottom_b;
+	info->bottom_b = info->bottom_b->prev;
+	info->bottom_b->next = NULL;
+	info->top_b->prev = tmp;
+	tmp->next = info->top_b;
+	info->top_b = tmp;
+	info->top_b->prev = NULL;
+	write(1, "rrb\n", 4);
+}
+
+void	rrr(t_info *info)
+{
+	t_numbers	*tmp;
+	if (info->size_b < 2 || info->size_a < 2)
+	{
+		return ;
+	}
+	tmp = info->bottom_a;
+	info->bottom_a = info->bottom_a->prev;
+	info->bottom_a->next = NULL;
+	info->top_a->prev = tmp;
+	tmp->next = info->top_a;
+	info->top_a = tmp;
+	info->top_a->prev = NULL;
+	tmp = info->bottom_b;
+	info->bottom_b = info->bottom_b->prev;
+	info->bottom_b->next = NULL;
+	info->top_b->prev = tmp;
+	tmp->next = info->top_b;
+	info->top_b = tmp;
+	info->top_b->prev = NULL;
+	write(1, "rrr\n", 4);
+}
+
+void	test_instuct(t_info *info)
 {
 	printf("test_instuct\n");
-	printf("test_print_stack(a);\n");
-	test_print_stack(a);
+	test_print_stack(info);
 	printf("size_a = %d\n", info->size_a);
-	printf("sa(a, info);\n");
-	sa(a, info);
-	test_print_stack(a);
-	printf("pb(&a, &b, info)*3 stack_a b\n");
-	pb(&a, &b, info);
-	pb(&a, &b, info);
-	pb(&a, &b, info);
-	printf("stack_a\n");
-	test_print_stack(a);
+	sa(info);
+	test_print_stack(info);
+	pb(info);
+	pb(info);
+	pb(info);
+	test_print_stack(info);
 	printf("size_a = %d\n", info->size_a);
-	printf("stack_b\n");
-	test_print_stack(b);
 	printf("size_b = %d\n", info->size_b);
-	sb(b, info);
-	printf("stack_b\n");
-	test_print_stack(b);
-	pa(&a, &b, info);
-	printf("stack_a\n");
-	test_print_stack(a);
+	sb(info);
+	test_print_stack(info);
+	pa(info);
+	test_print_stack(info);
 	printf("size_a = %d\n", info->size_a);
-	printf("stack_b\n");
-	test_print_stack(b);
 	printf("size_b = %d\n", info->size_b);
-	ss(a, b, info);
-	printf("stack_a\n");
-	test_print_stack(a);
-	printf("stack_b\n");
-	test_print_stack(b);
+	ss(info);
+	test_print_stack(info);
+	pa(info);
+	pa(info);
+	test_print_stack(info);
+	pb(info);
+	pb(info);
+	pb(info);
+	pb(info);
+	test_print_stack(info);
+	printf("size_a = %d\n", info->size_a);
+	printf("size_b = %d\n", info->size_b);
+	pa(info);
+	pa(info);
+	pa(info);
+	pa(info);
+	test_print_stack(info);
+	printf("size_a = %d\n", info->size_a);
+	printf("size_b = %d\n", info->size_b);
+	pb(info);
+	pb(info);
+	pb(info);
+	test_print_stack(info);
+	printf("size_a = %d\n", info->size_a);
+	printf("size_b = %d\n", info->size_b);
+	ra(info);
+	rb(info);
+	test_print_stack(info);
+	rr(info);
+	test_print_stack(info);
+	rra(info);
+	rrb(info);
+	test_print_stack(info);
+	rrr(info);
+	test_print_stack(info);
+}
+
+void	ft_sort_a_three(t_info *info)
+{
+	int	top;
+	int	mid;
+	int	bot;
+
+	top = info->top_a->content;
+	mid = info->top_a->next->content;
+	bot = info->top_a->next->next->content;
+	if (top > mid && mid > bot && top > bot)
+	{
+		sa(info);
+		rra(info);
+	}
+	else if (top > mid && bot > mid && top > bot)
+		ra(info);
+	else if (mid > top && mid > bot && bot > top)
+	{
+		sa(info);
+		ra(info);
+	}
+	else if (top > mid && bot > mid && bot > top)
+		sa(info);
+	else if (mid > top && mid > bot && top > bot)
+		rra(info);
+}
+
+void	ft_sort_3div_insruct(t_info *info, int pivot1, int pivot2)
+{
+	if (info->top_a->content < pivot1)
+	{
+		pb(info);
+		rb(info);
+	}
+	else if (info->top_a->content < pivot2)
+		pb(info);
+	else
+		ra(info);
+}
+
+void	ft_sort_three_division(t_info *info)
+{
+	int	index;
+	int	pivot1;
+	int	pivot2;
+
+	index = info->size_a / 3;
+	pivot1 = info->array[index];
+	index = info->size_a * 2 / 3;
+	pivot2 = info->array[index];
+	index = info->size_a;
+	while (index)
+	{
+		ft_sort_3div_insruct(info, pivot1, pivot2);
+		index--;
+	}
+}
+
+int		get_stack_min(t_numbers *stack)
+{
+	int	ret;
+
+
+	//printf("get_stack_min start\n");
+	ret = stack->content;
+	while (stack)
+	{
+		// printf("get_stack_min ret = %d\n", ret);
+		// printf("get_stack_min stack->content = %d\n", stack->content);
+		if (ret > stack->content)
+		{
+			ret = stack->content;
+			//printf("get_stack_min ret = %d\n", ret);
+		}
+		stack = stack->next;
+	}
+	//printf("get_stack_min end\n");
+	return (ret);
+}
+
+int		set_a_location_min(t_info *info)
+{
+	int			ret;
+	int			index;
+	int			tmp;
+	t_numbers	*stack_a;
+
+	ret = 0;
+	tmp = 0;
+	stack_a = info->top_a;
+	index = get_stack_min(stack_a);
+	while (stack_a)
+	{
+		tmp = stack_a->content;
+		if (tmp == index)
+			break ;
+		ret++;
+		stack_a = stack_a->next;
+	}
+	if (ret >= (info->size_a + 1) / 2)
+		ret = (info->size_a - ret) * -1;
+	return (ret);
+}
+
+
+int		get_stack_max(t_numbers *stack)
+{
+	int	ret;
+
+	ret = stack->content;
+	while (stack)
+	{
+		if (ret < stack->content)
+		{
+			ret = stack->content;
+		}
+		stack = stack->next;
+	}
+	return (ret);
+}
+
+int		set_a_location_max(t_info *info)
+{
+	int			ret;
+	int			index;
+	int			tmp;
+	t_numbers	*stack_a;
+
+	ret = 0;
+	tmp = 0;
+	stack_a = info->top_a;
+	index = get_stack_max(stack_a);
+	
+	while (stack_a)
+	{
+		tmp = stack_a->content;
+		if (tmp == index)
+			break ;
+		ret++;
+		stack_a = stack_a->next;
+	}
+	ret++;
+	if (ret >= (info->size_a + 1) / 2)
+		ret = (info->size_a - ret) * -1;
+	return (ret);
+}
+
+int		set_a_location_mid(int num, t_info *info)
+{
+	t_numbers	*stack_a;
+	int			ret;
+
+	stack_a = info->top_a;
+	ret = 1;
+	while (stack_a->next)
+	{
+		if (num > stack_a->content && num < stack_a->next->content)
+			break ;
+		ret++;
+		stack_a = stack_a->next;
+	}
+	if (ret >= (info->size_a + 1) / 2)
+		ret = (info->size_a - ret) * -1;
+	return (ret);
+}
+
+int		set_a_location(int num, t_info *info)
+{
+	int	ret;
+
+	if (num < get_stack_min(info->top_a))
+		ret = set_a_location_min(info);
+	else if (num > get_stack_max(info->top_a))
+		ret = set_a_location_max(info);
+	else
+		ret = set_a_location_mid(num, info);
+	return (ret);
+}
+
+int		ft_get_bigger(int a, int b, int a_loc, int b_loc)
+{
+	if (a < 0)
+		a = a * -1;
+	if (b < 0)
+		b = b * -1;
+	if (a_loc < 0)
+		a_loc = a_loc * -1;
+	if (b_loc < 0)
+		b_loc = b_loc * -1;
+	if (a + b > a_loc + b_loc)
+		return (1);
+	else
+		return (0);	
+}
+
+void	get_min_rotate(t_info *info, int *a, int *b)
+{
+	int			a_location;
+	int			b_location;
+	int			index;
+	t_numbers	*stack_b;
+	int			num;
+
+	index = 0;
+	stack_b = info->top_b;
+	while (index < info->size_b)
+	{
+		num = stack_b->content;
+		a_location = set_a_location(num, info);
+		if (index >= (info->size_b + 1) / 2)
+			b_location = (info->size_b - index) * -1;
+		else
+			b_location = index;
+		//printf("get_min_rotate *a = %d, *b = %d, a_location = %d, b_location = %d\n", *a, *b, a_location, b_location);
+		if (index == 0 || ft_get_bigger(*a, *b, a_location, b_location))
+		{
+			*a = a_location;
+			*b = b_location;
+		}
+		stack_b = stack_b->next;
+		index++;
+	}
+}
+
+void	ft_rotate_same(t_info *info, int *a, int *b)
+{
+	while (*a && *b && (*a > 0 && *b > 0))
+	{
+		rr(info);
+		*a = *a - 1;
+		*b = *b - 1;
+	}
+	while (*a && *b && (*a < 0 && *b < 0))
+	{
+		rrr(info);
+		*a = *a + 1;
+		*b = *b + 1;
+	}
+}
+
+void	ft_rotate_diff(t_info *info, int a, int b)
+{
+	while (a)
+	{
+		if (a > 0)
+		{
+			ra(info);
+			a--;
+		}
+		else
+		{
+			rra(info);
+			a++;
+		}
+	}
+	while (b)
+	{
+		if (b > 0)
+		{
+			rb(info);
+			b--;
+		}
+		else
+		{
+			rrb(info);
+			b++;
+		}
+	}
+}
+
+void	ft_sort_big_last(t_info *info)
+{
+	int	min;
+	int	min_location;
+
+	min = get_stack_min(info->top_a);
+	min_location = set_a_location_min(info);
+	while (min_location)
+	{
+		if (min_location > 0)
+		{
+			ra(info);
+			min_location--;
+		}
+		else
+		{
+			rra(info);
+			min_location++;
+		}
+	}
+}
+
+void	ft_sort_big(t_info *info)
+{
+	int	a;
+	int	b;
+
+	ft_sort_three_division(info);
+	while (info->size_a > 3)
+		pb(info);
+	if (info->size_a == 2)
+	{
+		if (info->top_a->content > info->top_a->next->content)
+			sa(info);
+	}
+	if (info->size_a == 3)
+		ft_sort_a_three(info);
+	while (info->size_b)
+	{
+		a = 0;
+		b = 0;
+		//test_print_stack(info);
+		get_min_rotate(info, &a, &b);
+		ft_rotate_same(info, &a, &b);
+		ft_rotate_diff(info, a, b);
+		pa(info);
+	}
+	ft_sort_big_last(info);
+}
+
+void	ft_sort(t_info *info)
+{
+	if (info->size_a == 2)
+	{
+		if (info->top_a->content > info->top_a->next->content)
+			sa(info);
+	}
+	else if (info->size_a == 3)
+	{
+		ft_sort_a_three(info);
+	}
+	else
+	{
+		ft_sort_big(info);
+	}
 }
 
 int	main(int ac, char *av[])
 {
 	int			array_size;
-	long long	*num_array;
-	t_numbers	*stack_a;
-	t_numbers	*stack_b;
+	int			*num_array;
 	t_info		*info;
 
 	if (ac < 2)
@@ -488,21 +1006,13 @@ int	main(int ac, char *av[])
 		print_error(-1);
 	}	
 	array_size = 0;
-	stack_a = ft_stack_new();
-	stack_b = ft_stack_new();
 	info = ft_info_new();
 	array_size = get_str_size(ac, av);
 	num_array = ft_av_to_array(ac, av, array_size);
-	test_print_array(num_array, array_size);
-	// printf("size_a = %d\n", info->size_a);
-	ft_arr_to_stack(stack_a, num_array, info, array_size);
-	// printf("size_a = %d\n", info->size_a);
-	// printf("size = %d\n" , get_stack_size(stack_a));
-	// printf("size = %d\n" , get_stack_size(stack_b));
-	// test_print_stack(stack_a);
-	test_instuct(stack_a, stack_b, info);
-	ft_array_sort(num_array, array_size);
-	// test_print_array(num_array, array_size);
-	//system("leaks main > leaks_result; cat leaks_result | grep leaked && rm -rf leaks_result");
+	ft_arr_to_stack(info, num_array, array_size);
+	ft_check_array_sort(num_array, array_size, 0);
+	info->array = (int *)num_array;
+	ft_sort(info);
+	system("leaks main > leaks_result; cat leaks_result | grep leaked && rm -rf leaks_result");
 	return (0);
 }

@@ -6,16 +6,13 @@
 /*   By: youjeon <youjeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/09 16:57:59 by youjeon           #+#    #+#             */
-/*   Updated: 2022/01/15 14:29:01 by youjeon          ###   ########.fr       */
+/*   Updated: 2022/01/15 14:40:19 by youjeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
 
-# include <unistd.h>
-# include <stdio.h>
-# include <stdlib.h>
 # include "libft/libft.h"
 
 typedef struct s_numbers
